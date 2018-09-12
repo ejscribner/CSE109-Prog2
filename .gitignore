@@ -1,0 +1,6 @@
+CMakeLists.txt
+.idea/
+cmake-build-debug/
+prog2
+cmake-build-default/
+prog2.dSYM/Contents/Info.plist
