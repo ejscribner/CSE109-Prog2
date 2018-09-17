@@ -11,7 +11,9 @@ int main(int argc, char **argv) {
     size_t n = 0;
     int arg ;
     int x;
-    if(argc == 2) {
+    if(argc == 1) {
+        arg = 100;
+    } else if(argc == 2) {
         arg = atoi(argv[1]);
     } else
     {
