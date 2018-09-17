@@ -37,16 +37,23 @@ int main(int argc, char **argv) {
     while ((lineLength = getline(&line, &n, stdin)) != -1) {
         if(lineLength > 0)
         {
-//            if(line[lineLength - 1] == '\n')
-//            {
-//                line[lineLength - 1] = '\0';
-//            }
+            if(line[lineLength - 1] == '\n')
+            {
+                line[lineLength - 1] = '\0';
+            }
         }
     }
 
-    char* bucket = (char*)malloc(x * sizeof(char));
-    strcpy(bucket, line);
-    fprintf(stdout, "The line is: %s\n", bucket);
+//    char* bucket = (char*)malloc(x * sizeof(char));
+    char buckets[2][14];
+    strcpy(buckets[0], "hello");
+    strcpy(buckets[1], "world");
+    int bucketSize = 2;
+//    strcpy(bucket, line);
+    for(int i = 0; i < bucketSize; i++) {
+        size_t numChars = strlen(buckets[i]);
+        fprintf(stdout, "%li: %s\n",numChars, buckets[i]);
+    }
 //    removeDuplicate(line, lineLength, )
     free(line);
     line = NULL;
