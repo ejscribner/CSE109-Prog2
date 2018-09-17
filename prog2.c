@@ -37,10 +37,10 @@ int main(int argc, char **argv) {
     while ((lineLength = getline(&line, &n, stdin)) != -1) {
         if(lineLength > 0)
         {
-            if(line[lineLength - 1] == '\n')
-            {
-                line[lineLength - 1] = '\0';
-            }
+//            if(line[lineLength - 1] == '\n')
+//            {
+//                line[lineLength - 1] = '\0';
+//            }
         }
     }
 
