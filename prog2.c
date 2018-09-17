@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <string.h>
 
 size_t removeDuplicate(char* line, size_t length, char* duplicate, size_t dupSize);
 size_t* addSize_tElement(size_t* list, size_t* size, size_t* capacity, size_t toAdd);
@@ -42,13 +43,18 @@ int main(int argc, char **argv) {
             }
         }
     }
-    fprintf(stdout, "The line is: %s\n", line);
+
+    char* bucket = (char*)malloc(x * sizeof(char));
+    strcpy(bucket, line);
+    fprintf(stdout, "The line is: %s\n", bucket);
+//    removeDuplicate(line, lineLength, )
     free(line);
     line = NULL;
 	return 0;
 }
 
 size_t removeDuplicate(char* line, size_t length, char* duplicate, size_t dupSize) {
+
     return 0;
 }
 
