@@ -40,14 +40,14 @@ int main(int argc, char **argv) {
     while (getline(&line, &lineLength, stdin) != -1) {
         words = strsplit(line, ", \t\n", &numWords);
 
-        if (words != NULL)
-        {
-            free(words);
-        }
     }
     for (size_t i = 0; i < numWords; i++) {
         printf("    word is: \"%s\"\n", words[i]);
         free(words[i]);
+    }
+    if (words != NULL)
+    {
+        free(words);
     }
 
 //    char* bucket = (char*)malloc(x * sizeof(char));
