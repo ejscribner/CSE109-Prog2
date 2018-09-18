@@ -46,12 +46,10 @@ int main(int argc, char **argv) {
 
 //    char* bucket = (char*)malloc(x * sizeof(char));
     char buckets[2][14];
-    strcpy(buckets[0], "hello");
-    strcpy(buckets[1], "world");
+    strcpy(buckets[0], line);
     int bucketSize = 2;
-//    strcpy(bucket, line);
     for(int i = 0; i < bucketSize; i++) {
-        size_t numChars = strlen(buckets[i]);
+        size_t numChars = strlen(buckets[i]) + 1;
         fprintf(stdout, "%li: %s\n",numChars, buckets[i]);
     }
 //    removeDuplicate(line, lineLength, )
