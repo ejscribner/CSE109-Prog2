@@ -45,8 +45,8 @@ int main(int argc, char **argv) {
     }
 
 //    char* bucket = (char*)malloc(x * sizeof(char));
-    char buckets[2][14];
-    strcpy(buckets[0], line);
+    char** buckets = (char**)malloc(x * sizeof(char));
+    strcpy(*buckets, line);
     int bucketSize = 2;
     for(int i = 0; i < bucketSize; i++) {
         size_t numChars = strlen(buckets[i]) + 1;
