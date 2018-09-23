@@ -43,10 +43,10 @@ int main(int argc, char **argv)
     }
     fprintf(stdout, "The number is: %i\n", bucketSize);
 
-    char** buckets = NULL;
+    char** buckets = (char**)malloc(20 * sizeof(char*));
     size_t numBuckets = 0;
-    size_t* bucketSizes = 0;
-    size_t* bucketSizesCapacity = 0;
+    size_t* bucketSizes = (size_t*)malloc(1* sizeof(size_t));
+    size_t bucketSizesCapacity = 1;
 
     ssize_t lineLen = 0;
     size_t n = 0;
@@ -75,25 +75,30 @@ int main(int argc, char **argv)
                 if(bucketSizes[i] + wordLength < bucketSize) {
                     //put in bucket
                     inserted = 1;
-                    strcpy(buckets[i], word);
+                    strcat(buckets[i], word);
+                    bucketSizes[i] += wordLength + 1;
+                    buckets[i][bucketSizes[i] - 1] = ' ';
                 }
             }
-
             if(inserted == 0) {
-                buckets[numBuckets + 1] = (char*)malloc(bucketSize * sizeof(char));
-                strcpy(buckets[numBuckets + 1], word);
-                bucketSizesCapacity = addSize_tElement(bucketSizes, &wordLength, bucketSizesCapacity, wordLength);
+                buckets[numBuckets] = (char*)malloc(bucketSize * sizeof(char));
+                strcpy(buckets[numBuckets], word);
+                buckets[numBuckets][wordLength] = ' ';
+                size_t tempNumBuckets = numBuckets;
+                bucketSizes = addSize_tElement(bucketSizes, &tempNumBuckets, &bucketSizesCapacity, wordLength + 1);
                 numBuckets++;
             }
 
             word = strtok (NULL, " \t");
         }
-
-
-
     }
+    //Call remove duplicate
+    fprintf(stdout, "Num buckets: %zu \n", numBuckets);
+    fprintf(stdout, "Bucket Sizes Capacity: %zu \n", bucketSizesCapacity);
 
-
+    for(int j = 0; j < numBuckets; j++) {
+        fprintf(stdout, "%zu: %s \n", bucketSizes[j], buckets[j]);
+    }
 
 
     free(line);
