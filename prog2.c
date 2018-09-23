@@ -98,8 +98,11 @@ int main(int argc, char **argv)
 
     for(int j = 0; j < numBuckets; j++) {
         fprintf(stdout, "%zu: %s \n", bucketSizes[j], buckets[j]);
+        free(buckets[j]);
+        buckets[j] = NULL;
     }
-
+    free(buckets);
+    buckets = NULL;
 
     free(line);
     line = NULL;
