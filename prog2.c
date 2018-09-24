@@ -1,3 +1,11 @@
+/*
+    CSE 109: Fall 2018
+    Elliot Scribner
+    ejs320
+    Program allocates buckets of memory to put words into and prints the result
+    Program #2
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -7,13 +15,11 @@ size_t removeDuplicate(char *line, size_t length, char *duplicate, size_t dupSiz
 
 size_t *addSize_tElement(size_t *list, size_t *size, size_t *capacity, size_t toAdd);
 
-char **strsplit(const char *str, const char *delim, size_t *numtokens);
+size_t occuranceCount(char *line, size_t length, char *duplicate, size_t dupSize);
 
 int main(int argc, char **argv)
 {
-    char *line = NULL;
-//    size_t lineLength = 0;
-//    size_t n = 0;
+    char* line = NULL;
     int arg = 100;
     int bucketSize = 100;
     if (argc == 1)
@@ -41,8 +47,6 @@ int main(int argc, char **argv)
             bucketSize = arg;
         }
     }
-    fprintf(stdout, "The number is: %i\n", bucketSize);
-
     char** buckets = (char**)malloc(20 * sizeof(char*));
     size_t numBuckets = 0;
     size_t* bucketSizes = (size_t*)malloc(1* sizeof(size_t));
@@ -59,25 +63,26 @@ int main(int argc, char **argv)
                 line[lineLen - 1] = '\0';
             }
         }
-        fprintf(stdout, "%s \n", line);
-
 
         char* word;
         word = strtok(line, " \t");
         while (word != NULL)
         {
-            printf ("%s\n", word);
-
-
             int inserted = 0;
             size_t wordLength = strlen(word);
+            if(wordLength > bucketSize - 1) {
+                break;
+            }
             for(int i = 0; i < numBuckets; i++) {
-                if(bucketSizes[i] + wordLength < bucketSize) {
+                if(bucketSizes[i] + wordLength + 1 < bucketSize - 1) {
                     //put in bucket
                     inserted = 1;
-                    strcat(buckets[i], word);
+                    size_t startIndex = bucketSizes[i];
+                    for(size_t j = startIndex; j < startIndex + wordLength; j++) {
+                        buckets[i][j] = word[j - startIndex];
+                    }
                     bucketSizes[i] += wordLength + 1;
-                    buckets[i][bucketSizes[i] - 1] = ' ';
+                    buckets[i][startIndex + wordLength] = ' ';
                 }
             }
             if(inserted == 0) {
@@ -92,12 +97,49 @@ int main(int argc, char **argv)
             word = strtok (NULL, " \t");
         }
     }
+
+
     //Call remove duplicate
-    fprintf(stdout, "Num buckets: %zu \n", numBuckets);
-    fprintf(stdout, "Bucket Sizes Capacity: %zu \n", bucketSizesCapacity);
+
+    for(int i = 0; i < numBuckets; i++) {
+        char* word = (char*)malloc(bucketSize * sizeof(char));
+        size_t wordLength = 0;
+        for(int j = 0; j < bucketSizes[i]; j++) {
+            char letter = buckets[i][j];
+            if(!isspace(letter)) {
+                word[wordLength] = letter;
+                wordLength++;
+            } else {
+                //word found to be removed
+                for(int k = i; k < numBuckets; k++) {
+                    size_t occurance = occuranceCount(buckets[k], bucketSizes[k], word, wordLength);
+                    if(occurance > 1 && k == i) {
+                        size_t newCurrentSize = removeDuplicate(buckets[i], bucketSizes[i], word, wordLength);
+                        newCurrentSize = removeDuplicate(buckets[i], newCurrentSize, word, wordLength);
+                        j -= bucketSizes[i] - newCurrentSize;
+                        bucketSizes[i] = newCurrentSize;
+                        break;
+                    } else if (occurance > 0 && k != i) {
+                        //removing word from current bucket
+                        size_t newCurrentSize = removeDuplicate(buckets[i], bucketSizes[i], word, wordLength);
+                        j -= bucketSizes[i] - newCurrentSize;
+                        bucketSizes[i] = newCurrentSize;
+                        bucketSizes[k] = removeDuplicate(buckets[k], bucketSizes[k], word, wordLength);
+                        break;
+                    }
+                }
+
+                wordLength = 0;
+
+
+            }
+        }
+    }
+
+
 
     for(int j = 0; j < numBuckets; j++) {
-        fprintf(stdout, "%zu: %s \n", bucketSizes[j], buckets[j]);
+        fprintf(stdout, "%*zu: %s \n", 6, bucketSizes[j], buckets[j]);
         free(buckets[j]);
         buckets[j] = NULL;
     }
@@ -111,35 +153,54 @@ int main(int argc, char **argv)
 
 size_t removeDuplicate(char *line, size_t length, char *duplicate, size_t dupSize)
 {
-    int i;
-    int flag = 0;
-    for(i = 0; i < length; i++) {
-        if(line[i] == duplicate[0]) {
-            int j;
-            for(j = 0; j < dupSize; j++) {
-                if(line[i+j] == duplicate[j]) {
-		            fprintf(stdout, "Line of %d+%d = %c \n", i, j, line[i+j]);
-                    flag = 1;
-                } else {
-                    flag = 0;
-                }
-                if(flag == 0) {
-                    break;
-                }
-            }
+    //find duplicate
+    int duplicateIndex = 0;
+    int dupStart = -1;
+    for(int i = 0; i < length; i++) {
+        if(duplicateIndex == dupSize - 1) {
             break;
         }
+        if(line[i] == duplicate[duplicateIndex]) {
+            if(duplicateIndex == 0) {
+                dupStart = i;
+            }
+
+            duplicateIndex++;
+        } else {
+            duplicateIndex = 0;
+            dupStart = -1;
+        }
     }
-    if(flag == 0) {
+
+    if(dupStart == -1) {
         return length;
     }
-    // delete word
-    size_t k;
-    for (k = dupSize; k < length - dupSize; k++)
-    {
-        line[k] = line[k + dupSize];
+
+
+    //remove duplicate
+    for(int j = dupStart; j < length; j++) {
+
+        line[j] = line[j + dupSize + 1];
     }
-    return 0;
+    return length - dupSize - 1;
+}
+
+size_t occuranceCount(char *line, size_t length, char *duplicate, size_t dupSize)
+{
+    size_t duplicateIndex = 0;
+    size_t numDups = 0;
+    for(int i = 0; i < length; i++) {
+        if(duplicateIndex == dupSize - 1) {
+            numDups++;
+            duplicateIndex = 0;
+        }
+        if(line[i] == duplicate[duplicateIndex]) {
+            duplicateIndex++;
+        } else {
+            duplicateIndex = 0;
+        }
+    }
+    return numDups;
 }
 
 size_t *addSize_tElement(size_t *list, size_t *size, size_t *capacity, size_t toAdd)
@@ -148,7 +209,7 @@ size_t *addSize_tElement(size_t *list, size_t *size, size_t *capacity, size_t to
     {
         size_t newCapacity = (2 * (*capacity)) + 1;
         size_t *newList = (size_t *) malloc(newCapacity * sizeof(size_t));
-        for (size_t i = 0; i < *size; i++)
+        for (int i = 0; i < *size; i++)
         {
             newList[i] = list[i];
         }
